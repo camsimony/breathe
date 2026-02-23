@@ -1,0 +1,499 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		078BE261CE5C615F8526ACB4 /* RemindersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770107CE44875E387B6B2DA /* RemindersSection.swift */; };
+		08840B5EF000F3B3488D1184 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9A29583A42C1061A6092CD /* MenuBarView.swift */; };
+		0ACC488CD79BCA73AEE02755 /* TimingPresetsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0A84D8144EC8065BABECBA /* TimingPresetsSection.swift */; };
+		1D2DED5CEC12037E73479DAB /* NSScreen+Notch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74697DE978286BFC4A32F2A4 /* NSScreen+Notch.swift */; };
+		2E6A4D3CE9946941A8317A05 /* GeneralSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A52436FCC13142808DC34 /* GeneralSection.swift */; };
+		39B7FE214F905CEA448E7A8D /* SessionProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0704D508BAE98872AA0E6ED0 /* SessionProgressView.swift */; };
+		3D5C2A81D6145203D7A5797A /* BreathingSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF9ED589A2C4F42EFCE2B2E /* BreathingSessionView.swift */; };
+		4077731034C1E423CED83406 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB12CE5791E853603437E14 /* OverlayWindowController.swift */; };
+		53687B0C82A46947913E1238 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D044CA32E077584B90D839D /* Assets.xcassets */; };
+		684975E0462301CAB5E7F4AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23E3984A58F1CAB0205BBB2 /* AppDelegate.swift */; };
+		6B65B14E84887AFCF2298127 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8786FC1BD4B88DD31750597 /* LaunchAtLoginManager.swift */; };
+		75F752BB337D1B6CD28007BD /* NotchOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */; };
+		77E048467B637BD118C69BC9 /* VisualEffectBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */; };
+		85068ABB69C09477A2B7B15D /* ShapeTunerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4D7952E6B2D4F33ADEBD2E /* ShapeTunerView.swift */; };
+		851AEAFB6FD0ED368C5F669A /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362C35629E26BAB6016F4E3D /* ReminderScheduler.swift */; };
+		86A7A7B73FFC195C20959255 /* BreathingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83F40FE94185F659B573C07 /* BreathingPhase.swift */; };
+		92B914C8F8583C88B0943BF9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9009A267051D0C02E8E16866 /* SettingsView.swift */; };
+		94B991738AFABEAADD54C4E9 /* BreatheApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE183F4B870318266BD75DDA /* BreatheApp.swift */; };
+		9A219EDCF617E0797E200B5B /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D5CD41BCA547E138315674 /* SessionSection.swift */; };
+		9B497F887ADCBAB9B4815327 /* BreathingPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A544CB2F11FFBE1CC438B /* BreathingPreset.swift */; };
+		9D481505063C2A250FE4C627 /* NotchShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9430A38A6528B825252E088D /* NotchShape.swift */; };
+		A973FDAAB5E5744B3A24EB29 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8CFA465EA29841BEC6813E /* UserSettings.swift */; };
+		AF64AEA51A6A58E330976273 /* NotchDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE401A31A3213804ED9C5100 /* NotchDetector.swift */; };
+		CE51310F076EEDEF2C100518 /* BreathingSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30ADD9745540D40BBA1D45 /* BreathingSessionViewModel.swift */; };
+		DEC3FDD48795793C9A0C627C /* SquarePathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFA4A49D78545C9AB4C780 /* SquarePathView.swift */; };
+		ED31AE6164D9B7470B162FA2 /* ReminderFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83094133F2122B3CAF178FAC /* ReminderFrequency.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0704D508BAE98872AA0E6ED0 /* SessionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionProgressView.swift; sourceTree = "<group>"; };
+		1AFC4FFF986105E4A6DDB4D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2EB12CE5791E853603437E14 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
+		362C35629E26BAB6016F4E3D /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
+		3C7A544CB2F11FFBE1CC438B /* BreathingPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingPreset.swift; sourceTree = "<group>"; };
+		4D9A52436FCC13142808DC34 /* GeneralSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSection.swift; sourceTree = "<group>"; };
+		64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchOverlayView.swift; sourceTree = "<group>"; };
+		6D30ADD9745540D40BBA1D45 /* BreathingSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingSessionViewModel.swift; sourceTree = "<group>"; };
+		74697DE978286BFC4A32F2A4 /* NSScreen+Notch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Notch.swift"; sourceTree = "<group>"; };
+		78D5CD41BCA547E138315674 /* SessionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSection.swift; sourceTree = "<group>"; };
+		7D0A84D8144EC8065BABECBA /* TimingPresetsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimingPresetsSection.swift; sourceTree = "<group>"; };
+		83094133F2122B3CAF178FAC /* ReminderFrequency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderFrequency.swift; sourceTree = "<group>"; };
+		8D044CA32E077584B90D839D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9009A267051D0C02E8E16866 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9430A38A6528B825252E088D /* NotchShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchShape.swift; sourceTree = "<group>"; };
+		9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectBackground.swift; sourceTree = "<group>"; };
+		A2D84C5978BA6877BD62B1EB /* Breathe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Breathe.entitlements; sourceTree = "<group>"; };
+		AA9A29583A42C1061A6092CD /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		AC8CFA465EA29841BEC6813E /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		B23E3984A58F1CAB0205BBB2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B770107CE44875E387B6B2DA /* RemindersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersSection.swift; sourceTree = "<group>"; };
+		B83F40FE94185F659B573C07 /* BreathingPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingPhase.swift; sourceTree = "<group>"; };
+		B8786FC1BD4B88DD31750597 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
+		BB4D7952E6B2D4F33ADEBD2E /* ShapeTunerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeTunerView.swift; sourceTree = "<group>"; };
+		CCF9ED589A2C4F42EFCE2B2E /* BreathingSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingSessionView.swift; sourceTree = "<group>"; };
+		CE183F4B870318266BD75DDA /* BreatheApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreatheApp.swift; sourceTree = "<group>"; };
+		CE401A31A3213804ED9C5100 /* NotchDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchDetector.swift; sourceTree = "<group>"; };
+		DAAFA4A49D78545C9AB4C780 /* SquarePathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquarePathView.swift; sourceTree = "<group>"; };
+		E26FFFFA01659EA6F1EE45CC /* Breathe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Breathe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1E0A14206381E9B2760B353F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B83F40FE94185F659B573C07 /* BreathingPhase.swift */,
+				3C7A544CB2F11FFBE1CC438B /* BreathingPreset.swift */,
+				83094133F2122B3CAF178FAC /* ReminderFrequency.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3E873F8C227648C854C8387C = {
+			isa = PBXGroup;
+			children = (
+				AB9575D4573DFF708256D0D1 /* Breathe */,
+				65E904B87EBC0CC6D339D909 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4023D1CCF8C34C95DFD11F7A /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				BB4D7952E6B2D4F33ADEBD2E /* ShapeTunerView.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+		4CDD95F7158C8DD5434F0168 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				AC8CFA465EA29841BEC6813E /* UserSettings.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		65E904B87EBC0CC6D339D909 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E26FFFFA01659EA6F1EE45CC /* Breathe.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66C133687271FDEDDF3E5875 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				6D30ADD9745540D40BBA1D45 /* BreathingSessionViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		807DCD6E2094E0F0EF72F601 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D044CA32E077584B90D839D /* Assets.xcassets */,
+				A2D84C5978BA6877BD62B1EB /* Breathe.entitlements */,
+				1AFC4FFF986105E4A6DDB4D4 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		9FD8910F9382F523DD7EB790 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C6C89E4E0B8709F566439F84 /* Breathing */,
+				4023D1CCF8C34C95DFD11F7A /* Debug */,
+				BFDB74611AB30CE23F521437 /* MenuBar */,
+				DE727F92F5859963E63BB9BD /* Settings */,
+				A5CAE3BBE2BD7FB4191E7632 /* Shared */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A5CAE3BBE2BD7FB4191E7632 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				9430A38A6528B825252E088D /* NotchShape.swift */,
+				9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		AB9575D4573DFF708256D0D1 /* Breathe */ = {
+			isa = PBXGroup;
+			children = (
+				EC6CCF3D2DDAD3969E71C9AA /* App */,
+				BC9E08A0C4FD202F93031672 /* Extensions */,
+				1E0A14206381E9B2760B353F /* Models */,
+				4CDD95F7158C8DD5434F0168 /* Persistence */,
+				807DCD6E2094E0F0EF72F601 /* Resources */,
+				ADDAD05E5A24BD1507C83635 /* Services */,
+				66C133687271FDEDDF3E5875 /* ViewModels */,
+				9FD8910F9382F523DD7EB790 /* Views */,
+			);
+			path = Breathe;
+			sourceTree = "<group>";
+		};
+		ADDAD05E5A24BD1507C83635 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B8786FC1BD4B88DD31750597 /* LaunchAtLoginManager.swift */,
+				CE401A31A3213804ED9C5100 /* NotchDetector.swift */,
+				2EB12CE5791E853603437E14 /* OverlayWindowController.swift */,
+				362C35629E26BAB6016F4E3D /* ReminderScheduler.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BC9E08A0C4FD202F93031672 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				74697DE978286BFC4A32F2A4 /* NSScreen+Notch.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		BFDB74611AB30CE23F521437 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				AA9A29583A42C1061A6092CD /* MenuBarView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		C6C89E4E0B8709F566439F84 /* Breathing */ = {
+			isa = PBXGroup;
+			children = (
+				CCF9ED589A2C4F42EFCE2B2E /* BreathingSessionView.swift */,
+				64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */,
+				0704D508BAE98872AA0E6ED0 /* SessionProgressView.swift */,
+				DAAFA4A49D78545C9AB4C780 /* SquarePathView.swift */,
+			);
+			path = Breathing;
+			sourceTree = "<group>";
+		};
+		DE727F92F5859963E63BB9BD /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				4D9A52436FCC13142808DC34 /* GeneralSection.swift */,
+				B770107CE44875E387B6B2DA /* RemindersSection.swift */,
+				78D5CD41BCA547E138315674 /* SessionSection.swift */,
+				9009A267051D0C02E8E16866 /* SettingsView.swift */,
+				7D0A84D8144EC8065BABECBA /* TimingPresetsSection.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		EC6CCF3D2DDAD3969E71C9AA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B23E3984A58F1CAB0205BBB2 /* AppDelegate.swift */,
+				CE183F4B870318266BD75DDA /* BreatheApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		23D6EFE0EB7CA77E58818D66 /* Breathe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79CD96FD4BD202FCD5FD4C07 /* Build configuration list for PBXNativeTarget "Breathe" */;
+			buildPhases = (
+				6155BEEC91F3326411E911E4 /* Sources */,
+				1B541E91CBE1D1D3E5DBC7A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Breathe;
+			packageProductDependencies = (
+			);
+			productName = Breathe;
+			productReference = E26FFFFA01659EA6F1EE45CC /* Breathe.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		21780DABE2DF7978DE374624 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 389B8124080DC6A650D35269 /* Build configuration list for PBXProject "Breathe" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3E873F8C227648C854C8387C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				23D6EFE0EB7CA77E58818D66 /* Breathe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1B541E91CBE1D1D3E5DBC7A3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53687B0C82A46947913E1238 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6155BEEC91F3326411E911E4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				684975E0462301CAB5E7F4AA /* AppDelegate.swift in Sources */,
+				94B991738AFABEAADD54C4E9 /* BreatheApp.swift in Sources */,
+				86A7A7B73FFC195C20959255 /* BreathingPhase.swift in Sources */,
+				9B497F887ADCBAB9B4815327 /* BreathingPreset.swift in Sources */,
+				3D5C2A81D6145203D7A5797A /* BreathingSessionView.swift in Sources */,
+				CE51310F076EEDEF2C100518 /* BreathingSessionViewModel.swift in Sources */,
+				2E6A4D3CE9946941A8317A05 /* GeneralSection.swift in Sources */,
+				6B65B14E84887AFCF2298127 /* LaunchAtLoginManager.swift in Sources */,
+				08840B5EF000F3B3488D1184 /* MenuBarView.swift in Sources */,
+				1D2DED5CEC12037E73479DAB /* NSScreen+Notch.swift in Sources */,
+				AF64AEA51A6A58E330976273 /* NotchDetector.swift in Sources */,
+				75F752BB337D1B6CD28007BD /* NotchOverlayView.swift in Sources */,
+				9D481505063C2A250FE4C627 /* NotchShape.swift in Sources */,
+				4077731034C1E423CED83406 /* OverlayWindowController.swift in Sources */,
+				ED31AE6164D9B7470B162FA2 /* ReminderFrequency.swift in Sources */,
+				851AEAFB6FD0ED368C5F669A /* ReminderScheduler.swift in Sources */,
+				078BE261CE5C615F8526ACB4 /* RemindersSection.swift in Sources */,
+				39B7FE214F905CEA448E7A8D /* SessionProgressView.swift in Sources */,
+				9A219EDCF617E0797E200B5B /* SessionSection.swift in Sources */,
+				92B914C8F8583C88B0943BF9 /* SettingsView.swift in Sources */,
+				85068ABB69C09477A2B7B15D /* ShapeTunerView.swift in Sources */,
+				DEC3FDD48795793C9A0C627C /* SquarePathView.swift in Sources */,
+				0ACC488CD79BCA73AEE02755 /* TimingPresetsSection.swift in Sources */,
+				A973FDAAB5E5744B3A24EB29 /* UserSettings.swift in Sources */,
+				77E048467B637BD118C69BC9 /* VisualEffectBackground.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		464631D836E756788FE1CB96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Breathe/Resources/Breathe.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Breathe/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.breathe.app;
+				PRODUCT_NAME = Breathe;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		574A7AE91E4464FB173E8128 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		7778906516BA7DE9C5852583 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		FCC0BA52D830B435D2ACAFCA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Breathe/Resources/Breathe.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Breathe/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.breathe.app;
+				PRODUCT_NAME = Breathe;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		389B8124080DC6A650D35269 /* Build configuration list for PBXProject "Breathe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				574A7AE91E4464FB173E8128 /* Debug */,
+				7778906516BA7DE9C5852583 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		79CD96FD4BD202FCD5FD4C07 /* Build configuration list for PBXNativeTarget "Breathe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FCC0BA52D830B435D2ACAFCA /* Debug */,
+				464631D836E756788FE1CB96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 21780DABE2DF7978DE374624 /* Project object */;
+}
