@@ -37,7 +37,7 @@ struct NotchOverlayView: View {
 
                     ZStack {
                         Text("\(countdownValue)")
-                            .font(.system(size: 48, weight: .light, design: .rounded))
+                            .font(.system(size: 48, weight: .regular, design: .rounded))
                             .foregroundStyle(.white)
                             .monospacedDigit()
                             .frame(width: CalmTextTransition.countdownDigitSlotWidth, alignment: .center)

@@ -18,7 +18,7 @@ enum CalmTextTransition {
     /// One line for 20pt semibold rounded; slot roll clip + luminous blob height.
     static let slotLineHeight: CGFloat = 28
 
-    /// Single 48pt light digit — fixed slot avoids horizontal shift.
+    /// Single 48pt regular rounded digit — fixed slot avoids horizontal shift.
     static let countdownDigitSlotWidth: CGFloat = 72
 
     // MARK: - Luminous blob (slot-sized pill + overlapped crossfades)
