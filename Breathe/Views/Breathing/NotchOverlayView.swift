@@ -8,8 +8,8 @@ struct NotchOverlayView: View {
     @State private var isExpanded = false
     @State private var contentRevealed = false
     @State private var countdownValue: Int = 3
-    @State private var countdownVisible = false
-    @State private var countdownFinished = false
+    @State private var countdownBlur: CGFloat = CalmTextTransition.maxBlurRadius
+    @State private var countdownOpacity: CGFloat = 0
 
     private var notchWidth: CGFloat { notchInfo.notchWidth }
     private var notchHeight: CGFloat { notchInfo.notchHeight }
@@ -40,9 +40,9 @@ struct NotchOverlayView: View {
                             .font(.system(size: 48, weight: .light, design: .rounded))
                             .foregroundStyle(.white)
                             .monospacedDigit()
-                            .opacity(countdownVisible ? 1 : 0)
-                            .scaleEffect(countdownVisible ? 1 : 0.5)
-                            .blur(radius: countdownVisible ? 0 : 4)
+                            .frame(width: CalmTextTransition.countdownDigitSlotWidth, alignment: .center)
+                            .blur(radius: countdownBlur)
+                            .opacity(countdownOpacity)
 
                         SquarePathView(viewModel: viewModel)
                             .opacity(contentRevealed ? 1 : 0)
@@ -85,35 +85,59 @@ struct NotchOverlayView: View {
             }
     }
 
-    // MARK: - Countdown
+    // MARK: - Countdown (calm blur envelope)
 
     private func startCountdown() {
-        showNumber(3) {
-            showNumber(2) {
-                showNumber(1) {
-                    finishCountdown()
+        countdownValue = 3
+        countdownBlur = CalmTextTransition.maxBlurRadius
+        countdownOpacity = 0
+        withAnimation(.easeInOut(duration: CalmTextTransition.halfDuration)) {
+            countdownBlur = 0
+            countdownOpacity = 1
+        }
+
+        let h = CalmTextTransition.halfDuration
+        let hold = CalmTextTransition.holdAfterSharp
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + h + hold) {
+            blurOutSwapBlurIn(nextValue: 2) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + hold) {
+                    blurOutSwapBlurIn(nextValue: 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + hold) {
+                            blurOutOnly { finishCountdown() }
+                        }
+                    }
                 }
             }
         }
     }
 
-    private func showNumber(_ n: Int, completion: @escaping () -> Void) {
-        countdownValue = n
-        withAnimation(.easeOut(duration: 0.25)) {
-            countdownVisible = true
+    private func blurOutSwapBlurIn(nextValue: Int, completion: @escaping () -> Void) {
+        let h = CalmTextTransition.halfDuration
+        withAnimation(.easeInOut(duration: h)) {
+            countdownBlur = CalmTextTransition.maxBlurRadius
+            countdownOpacity = 0
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-            withAnimation(.easeIn(duration: 0.2)) {
-                countdownVisible = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + h) {
+            countdownValue = nextValue
+            withAnimation(.easeInOut(duration: h)) {
+                countdownBlur = 0
+                countdownOpacity = 1
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                completion()
-            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + h, execute: completion)
         }
     }
 
+    private func blurOutOnly(completion: @escaping () -> Void) {
+        let h = CalmTextTransition.halfDuration
+        withAnimation(.easeInOut(duration: h)) {
+            countdownBlur = CalmTextTransition.maxBlurRadius
+            countdownOpacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + h, execute: completion)
+    }
+
     private func finishCountdown() {
-        countdownFinished = true
         viewModel.start()
         withAnimation(.easeOut(duration: 0.35)) {
             contentRevealed = true

@@ -1,5 +1,23 @@
 import SwiftUI
 
+private extension Animation {
+    static func luminousOutgoing(duration: TimeInterval) -> Animation {
+        .timingCurve(0.2, 0, 0.25, 1, duration: duration)
+    }
+
+    static func luminousIncoming(duration: TimeInterval) -> Animation {
+        .timingCurve(0.25, 0, 0.2, 1, duration: duration)
+    }
+
+    static func breathIn(duration: TimeInterval) -> Animation {
+        .timingCurve(0.42, 0, 0.18, 1, duration: duration)
+    }
+
+    static func breathOut(duration: TimeInterval) -> Animation {
+        .timingCurve(0.2, 0, 0.42, 1, duration: duration)
+    }
+}
+
 struct ShapeTunerView: View {
     @State private var shapeWidth: CGFloat = 290
     @State private var shapeHeight: CGFloat = 240
@@ -10,13 +28,37 @@ struct ShapeTunerView: View {
     @State private var overshootPct: CGFloat = 0.61
     @State private var curveBlend: CGFloat = 0.55
 
-    @AppStorage("textTransitionStyle") private var selectedTransitionRaw: String = "pushUp"
+    @AppStorage("textTransitionStyle") private var selectedTransitionRaw: String = "calmEnvelope"
+    @AppStorage("breathApproachLeadSeconds") private var breathApproachLeadSeconds = 1.0
     private var selectedTransition: TextTransitionStyle {
-        get { TextTransitionStyle(rawValue: selectedTransitionRaw) ?? .pushUp }
+        get { TextTransitionStyle(rawValue: selectedTransitionRaw) ?? .calmEnvelope }
     }
     @State private var previewPhaseIndex: Int = 0
     @State private var previewTimer: Timer?
     @State private var morphBlur: CGFloat = 0
+    @State private var morphPreviewOpacity: CGFloat = 1
+
+    @State private var reelPreviewTop: String = "Inhale"
+    @State private var reelPreviewBottom: String = "Inhale"
+    @State private var reelPreviewOffset: CGFloat = 0
+
+    @State private var calmPreviewDisplayed: String = "Inhale"
+    @State private var calmPreviewBlur: CGFloat = 0
+    @State private var calmPreviewOpacity: CGFloat = 1
+    @State private var calmPreviewToken: Int = 0
+
+    @State private var luminousPreviewTextBlur: CGFloat = 0
+    @State private var luminousPreviewTextOpacity: CGFloat = 1
+    @State private var luminousPreviewBlobOpacity: CGFloat = 0
+    @State private var luminousPreviewLeadBlur: CGFloat = 0
+    @State private var luminousPreviewLeadBlobOpacity: CGFloat = 0
+    @State private var luminousPreviewTransitionActive = false
+    @State private var luminousPreviewToken: Int = 0
+
+    @State private var breathPreviewBlur: CGFloat = 0
+    @State private var breathPreviewOpacity: CGFloat = 1
+    @State private var breathPreviewToken: Int = 0
+    @State private var breathPreviewLoopToken: Int = 0
 
     private let phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"]
 
@@ -140,20 +182,156 @@ struct ShapeTunerView: View {
                     .fill(Color.black)
                     .frame(height: 60)
 
-                transitionedText(phaseLabels[previewPhaseIndex])
+                if selectedTransition == .calmEnvelope {
+                    Text(calmPreviewDisplayed)
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
+                        .blur(radius: calmPreviewBlur)
+                        .opacity(calmPreviewOpacity)
+                } else if selectedTransition == .breathBlur {
+                    Text(calmPreviewDisplayed)
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
+                        .blur(radius: breathPreviewBlur)
+                        .opacity(breathPreviewOpacity)
+                } else if selectedTransition == .luminousBlob {
+                    let slotW = CalmTextTransition.phaseLabelSlotWidth
+                    let slotH = CalmTextTransition.slotLineHeight
+                    let capW = max(32, slotW - 2 * CalmTextTransition.luminousCapsuleInsetH)
+                    let capH = max(14, slotH - 2 * CalmTextTransition.luminousCapsuleInsetV)
+                    ZStack {
+                        Capsule()
+                            .fill(Color.white.opacity(0.86))
+                            .frame(width: capW, height: capH)
+                            .blur(radius: CalmTextTransition.luminousBlobShapeBlur)
+                            .opacity(luminousPreviewTransitionActive ? luminousPreviewBlobOpacity : luminousPreviewLeadBlobOpacity)
+                        Text(calmPreviewDisplayed)
+                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .frame(width: slotW, height: slotH, alignment: .center)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                            .blur(radius: luminousPreviewTransitionActive ? luminousPreviewTextBlur : luminousPreviewLeadBlur)
+                            .opacity(luminousPreviewTransitionActive ? luminousPreviewTextOpacity : 1)
+                    }
+                    .frame(width: slotW, height: slotH)
+                } else if selectedTransition == .slotRoll {
+                    VStack(spacing: 0) {
+                        Text(reelPreviewTop)
+                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                        Text(reelPreviewBottom)
+                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .frame(width: CalmTextTransition.phaseLabelSlotWidth, height: CalmTextTransition.slotLineHeight, alignment: .top)
+                    .clipped()
+                    .offset(y: reelPreviewOffset)
+                } else {
+                    transitionedText(phaseLabels[previewPhaseIndex])
+                }
             }
-            .onAppear { startPreviewCycle() }
-            .onDisappear { previewTimer?.invalidate() }
-            .onChange(of: selectedTransitionRaw) { _, _ in
-                previewPhaseIndex = 0
-                restartPreviewCycle()
+
+            if selectedTransition == .breathBlur {
+                Divider()
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Breath blur timing")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    HStack {
+                        Text("Blur starts before “phase end”")
+                            .font(.caption)
+                        Spacer()
+                        Text(String(format: "%.2f s", breathApproachLeadSeconds))
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(
+                        value: $breathApproachLeadSeconds,
+                        in: 0.05...(CalmTextTransition.breathPreviewFakePhaseDuration - 0.1),
+                        step: 0.03
+                    )
+                    Text("Preview treats each label as a \(String(format: "%.1f", CalmTextTransition.breathPreviewFakePhaseDuration))s phase. Larger lead = more sharp time, then blur sooner before the swap. Same value is used in a live session.")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.tertiary)
+                }
             }
+        }
+        .onChange(of: breathApproachLeadSeconds) { _, _ in
+            restartBreathPreviewLoopOnly()
+        }
+        .onAppear {
+            calmPreviewDisplayed = phaseLabels[previewPhaseIndex]
+            calmPreviewBlur = 0
+            calmPreviewOpacity = 1
+            luminousPreviewTextBlur = 0
+            luminousPreviewTextOpacity = 1
+            luminousPreviewBlobOpacity = 0
+            luminousPreviewLeadBlur = 0
+            luminousPreviewLeadBlobOpacity = 0
+            luminousPreviewTransitionActive = false
+            breathPreviewBlur = 0
+            breathPreviewOpacity = 1
+            let l = phaseLabels[previewPhaseIndex]
+            reelPreviewTop = l
+            reelPreviewBottom = l
+            reelPreviewOffset = 0
+            morphPreviewOpacity = 1
+            startPreviewCycle()
+        }
+        .onDisappear {
+            previewTimer?.invalidate()
+            previewTimer = nil
+            breathPreviewLoopToken += 1
+        }
+        .onChange(of: selectedTransitionRaw) { _, _ in
+            previewPhaseIndex = 0
+            calmPreviewDisplayed = phaseLabels[0]
+            calmPreviewBlur = 0
+            calmPreviewOpacity = 1
+            luminousPreviewTextBlur = 0
+            luminousPreviewTextOpacity = 1
+            luminousPreviewBlobOpacity = 0
+            luminousPreviewLeadBlur = 0
+            luminousPreviewLeadBlobOpacity = 0
+            luminousPreviewTransitionActive = false
+            breathPreviewBlur = 0
+            breathPreviewOpacity = 1
+            let l = phaseLabels[0]
+            reelPreviewTop = l
+            reelPreviewBottom = l
+            reelPreviewOffset = 0
+            morphPreviewOpacity = 1
+            morphBlur = 0
+            restartPreviewCycle()
         }
     }
 
     @ViewBuilder
     private func transitionedText(_ text: String) -> some View {
         switch selectedTransition {
+        case .calmEnvelope:
+            Text(text)
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
+
+        case .breathBlur:
+            Text(text)
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
+
+        case .luminousBlob:
+            Text(text)
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
+
         case .opacity:
             Text(text)
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
@@ -165,9 +343,19 @@ struct ShapeTunerView: View {
             Text(text)
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
+                .frame(width: CalmTextTransition.phaseLabelSlotWidth, alignment: .center)
                 .contentTransition(.interpolate)
-                .animation(.easeInOut(duration: 0.6), value: previewPhaseIndex)
+                .animation(
+                    .easeInOut(duration: CalmTextTransition.morphPeakDuration + CalmTextTransition.morphSettleDuration),
+                    value: previewPhaseIndex
+                )
                 .blur(radius: morphBlur)
+                .opacity(morphPreviewOpacity)
+
+        case .slotRoll:
+            Text(text)
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
 
         case .pushUp:
             Text(text)
@@ -205,19 +393,210 @@ struct ShapeTunerView: View {
     }
 
     private func startPreviewCycle() {
-        previewTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
-            if selectedTransition == .interpolate {
-                withAnimation(.easeOut(duration: 0.25)) { morphBlur = 6 }
-                withAnimation(.easeIn(duration: 0.6).delay(0.25)) { morphBlur = 0 }
+        previewTimer?.invalidate()
+        previewTimer = nil
+        breathPreviewLoopToken += 1
+
+        let style = TextTransitionStyle(rawValue: selectedTransitionRaw) ?? .calmEnvelope
+        if style == .breathBlur {
+            startBreathPreviewLoopSequence()
+            return
+        }
+
+        // Luminous ~2.2s+ — keep headroom.
+        previewTimer = Timer.scheduledTimer(withTimeInterval: 3.2, repeats: true) { _ in
+            let t = TextTransitionStyle(rawValue: selectedTransitionRaw) ?? .calmEnvelope
+            if t == .calmEnvelope {
+                let next = (previewPhaseIndex + 1) % phaseLabels.count
+                runCalmPreviewEnvelope(to: phaseLabels[next]) {
+                    previewPhaseIndex = next
+                }
+            } else if t == .luminousBlob {
+                let next = (previewPhaseIndex + 1) % phaseLabels.count
+                runLuminousPreviewEnvelope(to: phaseLabels[next]) {
+                    previewPhaseIndex = next
+                }
+            } else if t == .slotRoll {
+                runSlotPreviewStep()
+            } else if t == .interpolate {
+                runMorphPreviewStep()
+            } else {
+                withAnimation {
+                    previewPhaseIndex = (previewPhaseIndex + 1) % phaseLabels.count
+                }
             }
-            withAnimation {
-                previewPhaseIndex = (previewPhaseIndex + 1) % phaseLabels.count
+        }
+    }
+
+    private func startBreathPreviewLoopSequence() {
+        breathPreviewLoopToken += 1
+        let token = breathPreviewLoopToken
+        scheduleBreathPreviewWaitThenCycle(token: token)
+    }
+
+    private func scheduleBreathPreviewWaitThenCycle(token: Int) {
+        guard TextTransitionStyle(rawValue: selectedTransitionRaw) == .breathBlur else { return }
+        breathPreviewBlur = 0
+        breathPreviewOpacity = 1
+        calmPreviewDisplayed = phaseLabels[previewPhaseIndex]
+
+        let fake = CalmTextTransition.breathPreviewFakePhaseDuration
+        let lead = max(0.05, breathApproachLeadSeconds)
+        let wait = max(0.08, fake - lead)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + wait) {
+            guard token == breathPreviewLoopToken else { return }
+            guard TextTransitionStyle(rawValue: selectedTransitionRaw) == .breathBlur else { return }
+            let next = (previewPhaseIndex + 1) % phaseLabels.count
+            runBreathPreviewEnvelope(to: phaseLabels[next]) {
+                guard token == breathPreviewLoopToken else { return }
+                previewPhaseIndex = next
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    guard token == breathPreviewLoopToken else { return }
+                    scheduleBreathPreviewWaitThenCycle(token: token)
+                }
+            }
+        }
+    }
+
+    private func restartBreathPreviewLoopOnly() {
+        guard TextTransitionStyle(rawValue: selectedTransitionRaw) == .breathBlur else { return }
+        startBreathPreviewLoopSequence()
+    }
+
+    private func runMorphPreviewStep() {
+        let next = (previewPhaseIndex + 1) % phaseLabels.count
+        withAnimation(.easeInOut(duration: CalmTextTransition.morphPeakDuration)) {
+            morphBlur = CalmTextTransition.morphBlurPeak
+            morphPreviewOpacity = CalmTextTransition.morphOpacityAtPeak
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + CalmTextTransition.morphPeakDuration) {
+            previewPhaseIndex = next
+            withAnimation(.easeInOut(duration: CalmTextTransition.morphSettleDuration)) {
+                morphBlur = 0
+                morphPreviewOpacity = 1
+            }
+        }
+    }
+
+    private func runSlotPreviewStep() {
+        let next = (previewPhaseIndex + 1) % phaseLabels.count
+        reelPreviewTop = reelPreviewBottom
+        reelPreviewBottom = phaseLabels[next]
+        reelPreviewOffset = 0
+        withAnimation(.spring(duration: CalmTextTransition.slotRollDuration, bounce: 0.08)) {
+            reelPreviewOffset = -CalmTextTransition.slotLineHeight
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + CalmTextTransition.slotRollDuration + 0.03) {
+            previewPhaseIndex = next
+            reelPreviewTop = reelPreviewBottom
+            reelPreviewOffset = 0
+        }
+    }
+
+    private func runBreathPreviewEnvelope(to newLabel: String, completion: @escaping () -> Void) {
+        breathPreviewToken += 1
+        let token = breathPreviewToken
+        let inhale = CalmTextTransition.breathInDuration
+        let exhale = CalmTextTransition.breathOutDuration
+        let opFade = CalmTextTransition.breathOpacityFadeDuration
+
+        withAnimation(.easeInOut(duration: opFade)) {
+            breathPreviewOpacity = CalmTextTransition.breathOpacityAtPeak
+        }
+        withAnimation(.breathIn(duration: inhale)) {
+            breathPreviewBlur = CalmTextTransition.breathBlurPeak
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + inhale) {
+            guard token == breathPreviewToken else { return }
+            calmPreviewDisplayed = newLabel
+            withAnimation(.easeInOut(duration: opFade)) {
+                breathPreviewOpacity = 1
+            }
+            withAnimation(.breathOut(duration: exhale)) {
+                breathPreviewBlur = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + exhale) {
+                guard token == breathPreviewToken else { return }
+                completion()
+            }
+        }
+    }
+
+    private func runCalmPreviewEnvelope(to newLabel: String, completion: @escaping () -> Void) {
+        calmPreviewToken += 1
+        let token = calmPreviewToken
+        let half = CalmTextTransition.halfDuration
+        withAnimation(.easeInOut(duration: half)) {
+            calmPreviewBlur = CalmTextTransition.maxBlurRadius
+            calmPreviewOpacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + half) {
+            guard token == calmPreviewToken else { return }
+            calmPreviewDisplayed = newLabel
+            withAnimation(.easeInOut(duration: half)) {
+                calmPreviewBlur = 0
+                calmPreviewOpacity = 1
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + half) {
+                completion()
+            }
+        }
+    }
+
+    private func runLuminousPreviewEnvelope(to newLabel: String, completion: @escaping () -> Void) {
+        luminousPreviewToken += 1
+        let token = luminousPreviewToken
+        let peakBlur = CalmTextTransition.luminousTextBlurPeak
+        let outDur = CalmTextTransition.luminousOutgoingCrossfadeDuration
+        let inDur = CalmTextTransition.luminousIncomingCrossfadeDuration
+        let leadDur = CalmTextTransition.luminousPreviewLeadInDuration
+
+        luminousPreviewTransitionActive = false
+        let endTail = CalmTextTransition.preTailBlend(phaseProgress: 1)
+        withAnimation(.linear(duration: leadDur)) {
+            luminousPreviewLeadBlur = endTail.blur
+            luminousPreviewLeadBlobOpacity = endTail.blobOpacity
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + leadDur) {
+            guard token == luminousPreviewToken else { return }
+            luminousPreviewTransitionActive = true
+            let carriedBlur = max(luminousPreviewLeadBlur, endTail.blur)
+            let carriedBlob = max(luminousPreviewLeadBlobOpacity, endTail.blobOpacity)
+            luminousPreviewTextBlur = carriedBlur
+            luminousPreviewBlobOpacity = carriedBlob
+
+            withAnimation(.luminousOutgoing(duration: outDur)) {
+                luminousPreviewTextBlur = peakBlur
+                luminousPreviewTextOpacity = 0
+                luminousPreviewBlobOpacity = 1
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + outDur) {
+                guard token == luminousPreviewToken else { return }
+                calmPreviewDisplayed = newLabel
+                withAnimation(.luminousIncoming(duration: inDur)) {
+                    luminousPreviewBlobOpacity = 0
+                    luminousPreviewTextOpacity = 1
+                    luminousPreviewTextBlur = 0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + inDur) {
+                    guard token == luminousPreviewToken else { return }
+                    luminousPreviewTransitionActive = false
+                    luminousPreviewLeadBlur = 0
+                    luminousPreviewLeadBlobOpacity = 0
+                    completion()
+                }
             }
         }
     }
 
     private func restartPreviewCycle() {
         previewTimer?.invalidate()
+        previewTimer = nil
+        breathPreviewLoopToken += 1
         startPreviewCycle()
     }
 
