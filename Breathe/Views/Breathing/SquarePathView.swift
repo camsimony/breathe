@@ -39,7 +39,7 @@ struct SquarePathView: View {
     }
 
     @State private var displayedPhaseLabel: String
-    /// For `.calmEnvelope` / `.luminousBlob`, updates with the center text swap (after blur peak) so outer labels don’t light up ahead of the middle.
+    /// For delayed-chrome styles (e.g. calm, luminous, breath blur), updates with the center text swap so outer rails don’t lead the middle.
     @State private var chromePhase: BreathingPhase
     @State private var phaseBlur: CGFloat = 0
     @State private var phaseOpacity: CGFloat = 1
@@ -64,11 +64,13 @@ struct SquarePathView: View {
     @State private var breathOpacity: CGFloat = 1
     @State private var breathTransitionToken: Int = 0
     @State private var breathInFlight = false
+    /// Breath blur only: 1 = active rail at full brightness, 0 = active rail matches subdued rails (dims with center blur-in, brightens after word swap).
+    @State private var breathOuterIllumination: CGFloat = 1
 
     /// Phase for Inhale / Exhale / Hold rails: live `viewModel` except styles that delay chrome until the center transition catches up.
     private var labelPhase: BreathingPhase {
         switch transitionStyle {
-        case .calmEnvelope, .luminousBlob, .interpolate, .slotRoll:
+        case .calmEnvelope, .luminousBlob, .interpolate, .slotRoll, .breathBlur:
             return chromePhase
         default:
             return viewModel.currentPhase
@@ -87,11 +89,11 @@ struct SquarePathView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            phaseLabel("Hold", isActive: labelPhase == .holdIn)
+            phaseLabel("Hold", slot: .holdIn)
                 .padding(.bottom, 12)
 
             HStack(spacing: 0) {
-                phaseLabel("Inhale", isActive: labelPhase == .inhale)
+                phaseLabel("Inhale", slot: .inhale)
                     .frame(width: 54, alignment: .trailing)
 
                 Spacer().frame(width: 14)
@@ -121,11 +123,11 @@ struct SquarePathView: View {
 
                 Spacer().frame(width: 14)
 
-                phaseLabel("Exhale", isActive: labelPhase == .exhale)
+                phaseLabel("Exhale", slot: .exhale)
                     .frame(width: 54, alignment: .leading)
             }
 
-            phaseLabel("Hold", isActive: labelPhase == .holdOut)
+            phaseLabel("Hold", slot: .holdOut)
                 .padding(.top, 12)
         }
         .onAppear {
@@ -148,6 +150,13 @@ struct SquarePathView: View {
             breathBlur = 0
             breathOpacity = 1
             breathInFlight = false
+            breathOuterIllumination = 1
+        }
+        .onChange(of: transitionStyleRaw) { _, _ in
+            breathOuterIllumination = 1
+            if TextTransitionStyle(rawValue: transitionStyleRaw) == .breathBlur {
+                chromePhase = viewModel.currentPhase
+            }
         }
         .onChange(of: viewModel.phaseApproachSignal) { _, _ in
             guard transitionStyle == .breathBlur else { return }
@@ -301,22 +310,27 @@ struct SquarePathView: View {
         let peakBlur = CalmTextTransition.breathBlurPeak
         let peakOpacity = CalmTextTransition.breathOpacityAtPeak
 
+        breathOuterIllumination = 1
+
         withAnimation(.easeInOut(duration: opFade)) {
             breathOpacity = peakOpacity
         }
         withAnimation(.breathIn(duration: inhale)) {
             breathBlur = peakBlur
+            breathOuterIllumination = 0
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + inhale) {
             guard token == self.breathTransitionToken else { return }
             self.displayedPhaseLabel = self.viewModel.currentPhase.label
             self.chromePhase = self.viewModel.currentPhase
+            self.breathOuterIllumination = 0
             withAnimation(.easeInOut(duration: opFade)) {
                 self.breathOpacity = 1
             }
             withAnimation(.breathOut(duration: exhale)) {
                 self.breathBlur = 0
+                self.breathOuterIllumination = 1
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + exhale) {
                 guard token == self.breathTransitionToken else { return }
@@ -421,13 +435,31 @@ struct SquarePathView: View {
         }
     }
 
-    // MARK: - Phase Label
+    // MARK: - Phase Label (outer rails)
 
-    private func phaseLabel(_ text: String, isActive: Bool) -> some View {
+    private static let railDimOpacity: CGFloat = 0.15
+    private static let railBrightOpacity: CGFloat = 0.7
+
+    private func phaseLabel(_ text: String, slot: BreathingPhase) -> some View {
         Text(text)
             .font(.system(size: 13, weight: .medium, design: .rounded))
-            .foregroundStyle(isActive ? .white.opacity(0.7) : .white.opacity(0.15))
-            .animation(.easeOut(duration: 0.2), value: isActive)
+            .foregroundStyle(railLabelStyle(for: slot))
+            .animation(
+                transitionStyle == .breathBlur ? nil : .easeOut(duration: 0.2),
+                value: labelPhase == slot
+            )
+    }
+
+    private func railLabelStyle(for slot: BreathingPhase) -> Color {
+        if transitionStyle == .breathBlur {
+            if chromePhase == slot {
+                let t = Self.railDimOpacity + (Self.railBrightOpacity - Self.railDimOpacity) * breathOuterIllumination
+                return .white.opacity(t)
+            }
+            return .white.opacity(Self.railDimOpacity)
+        }
+        let isActive = labelPhase == slot
+        return .white.opacity(isActive ? Self.railBrightOpacity : Self.railDimOpacity)
     }
 
     // MARK: - Comet Tail
