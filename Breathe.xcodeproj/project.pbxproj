@@ -28,6 +28,7 @@
 		9A219EDCF617E0797E200B5B /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D5CD41BCA547E138315674 /* SessionSection.swift */; };
 		9B497F887ADCBAB9B4815327 /* BreathingPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A544CB2F11FFBE1CC438B /* BreathingPreset.swift */; };
 		9D481505063C2A250FE4C627 /* NotchShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9430A38A6528B825252E088D /* NotchShape.swift */; };
+		C8E4F1A02B9D4E6C8A1F2034 /* CalmTextTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F3E2A19C8B4D5E6F708192A /* CalmTextTransition.swift */; };
 		A973FDAAB5E5744B3A24EB29 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8CFA465EA29841BEC6813E /* UserSettings.swift */; };
 		AF64AEA51A6A58E330976273 /* NotchDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE401A31A3213804ED9C5100 /* NotchDetector.swift */; };
 		CE51310F076EEDEF2C100518 /* BreathingSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30ADD9745540D40BBA1D45 /* BreathingSessionViewModel.swift */; };
@@ -51,6 +52,7 @@
 		8D044CA32E077584B90D839D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9009A267051D0C02E8E16866 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9430A38A6528B825252E088D /* NotchShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchShape.swift; sourceTree = "<group>"; };
+		D7F3E2A19C8B4D5E6F708192A /* CalmTextTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalmTextTransition.swift; sourceTree = "<group>"; };
 		9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectBackground.swift; sourceTree = "<group>"; };
 		A2D84C5978BA6877BD62B1EB /* Breathe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Breathe.entitlements; sourceTree = "<group>"; };
 		AA9A29583A42C1061A6092CD /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 		A5CAE3BBE2BD7FB4191E7632 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				D7F3E2A19C8B4D5E6F708192A /* CalmTextTransition.swift */,
 				9430A38A6528B825252E088D /* NotchShape.swift */,
 				9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */,
 			);
@@ -313,6 +316,7 @@
 				0ACC488CD79BCA73AEE02755 /* TimingPresetsSection.swift in Sources */,
 				A973FDAAB5E5744B3A24EB29 /* UserSettings.swift in Sources */,
 				77E048467B637BD118C69BC9 /* VisualEffectBackground.swift in Sources */,
+				C8E4F1A02B9D4E6C8A1F2034 /* CalmTextTransition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

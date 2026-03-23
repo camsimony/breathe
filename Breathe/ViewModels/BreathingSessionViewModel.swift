@@ -13,10 +13,16 @@ final class BreathingSessionViewModel {
     var cyclesCompleted: Int = 0
     var shouldDismiss: Bool = false
 
+    /// Increments only when `currentPhase` changes — reliable `onChange` for blur envelope in hosted views.
+    private(set) var phaseGeneration: Int = 0
+    /// Once per phase, shortly before the phase ends — lets breath-blur UI start inhale before `phaseGeneration`.
+    private(set) var phaseApproachSignal: Int = 0
+
     var onSessionComplete: (() -> Void)?
 
     // MARK: - Configuration
 
+    private let settings: UserSettings
     private let preset: BreathingPreset
     private let sessionDuration: TimeInterval
 
@@ -26,8 +32,10 @@ final class BreathingSessionViewModel {
     private var phaseStartTime: Date?
     private var timer: Timer?
     private var phasesCompleted: Int = 0
+    private var emittedPhaseApproach: Bool = false
 
     init(settings: UserSettings) {
+        self.settings = settings
         self.preset = settings.currentPreset
         self.sessionDuration = settings.sessionDurationSeconds
     }
@@ -74,6 +82,12 @@ final class BreathingSessionViewModel {
         let phaseElapsed = now.timeIntervalSince(phaseStart)
         phaseProgress = min(CGFloat(phaseElapsed / phaseDuration), 1.0)
 
+        let lead = max(0.05, settings.breathApproachLeadSeconds)
+        if !emittedPhaseApproach, phaseDuration > lead + 0.08, phaseElapsed >= phaseDuration - lead {
+            emittedPhaseApproach = true
+            phaseApproachSignal += 1
+        }
+
         // Overall cycle progress (0-1 around the square)
         let cycleDuration = preset.totalCycleDuration
         let cycleElapsed = sessionElapsed.truncatingRemainder(dividingBy: cycleDuration)
@@ -90,9 +104,13 @@ final class BreathingSessionViewModel {
     }
 
     private func startPhase(_ phase: BreathingPhase) {
+        if currentPhase != phase {
+            phaseGeneration += 1
+        }
         currentPhase = phase
         phaseStartTime = Date()
         phaseProgress = 0
+        emittedPhaseApproach = false
     }
 
     // MARK: - Formatted Time
