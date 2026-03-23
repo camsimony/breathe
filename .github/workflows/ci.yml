@@ -8,7 +8,8 @@ on:
 
 jobs:
   test:
-    runs-on: macos-14
+    # macos-14 images ship Xcode 15, which cannot open project format 77 (Xcode 16+).
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
