@@ -33,3 +33,27 @@ targets:
       properties:
         com.apple.security.app-sandbox: false
         com.apple.security.files.user-selected.read-only: true
+
+  BreatheTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: BreatheTests
+    dependencies:
+      - target: Breathe
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.breathe.app.tests
+
+schemes:
+  Breathe:
+    build:
+      targets:
+        Breathe: all
+        BreatheTests: [test]
+    run:
+      executable: Breathe
+    test:
+      targets:
+        - BreatheTests

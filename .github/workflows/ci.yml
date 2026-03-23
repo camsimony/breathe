@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    # macos-14 images ship Xcode 15, which cannot open project format 77 (Xcode 16+).
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          xcodebuild test \
+            -project "Breathe.xcodeproj" \
+            -scheme "Breathe" \
+            -destination "platform=macOS" \
+            -quiet
