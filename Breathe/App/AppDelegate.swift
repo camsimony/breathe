@@ -1,16 +1,22 @@
 import AppKit
 import UserNotifications
 
-final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate, @preconcurrency UNUserNotificationCenterDelegate {
     let userSettings = UserSettings()
     let overlayController = OverlayWindowController()
     let reminderScheduler = ReminderScheduler()
     let launchAtLoginManager = LaunchAtLoginManager()
+    lazy var settingsPanelController = SettingsPanelController(settings: userSettings)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
         reminderScheduler.configure(with: userSettings)
         launchAtLoginManager.syncState(with: userSettings)
+    }
+
+    func showSettings() {
+        settingsPanelController.show()
     }
 
     // MARK: - Notification Delegate

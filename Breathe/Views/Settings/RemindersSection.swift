@@ -6,40 +6,61 @@ struct RemindersSection: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Frequency") {
-                Picker("Remind me", selection: $settings.reminderFrequencyRaw) {
-                    ForEach(ReminderFrequency.allCases) { freq in
-                        Text(freq.displayName).tag(freq.rawValue)
+        ScrollView {
+            VStack(spacing: 20) {
+                SettingsCard(title: "Frequency") {
+                    SettingsRow("Remind me") {
+                        Picker("", selection: $settings.reminderFrequencyRaw) {
+                            ForEach(ReminderFrequency.allCases) { freq in
+                                Text(freq.displayName).tag(freq.rawValue)
+                            }
+                        }
+                        .labelsHidden()
+                    }
+                }
+
+                SettingsCard(title: "Quiet Hours") {
+                    HStack {
+                        Text("Enable quiet hours")
+                            .font(.system(size: 13))
+                        Spacer()
+                        Toggle("", isOn: $settings.quietHoursEnabled)
+                            .toggleStyle(.switch)
+                            .controlSize(.mini)
+                            .labelsHidden()
+                    }
+                    .padding(.vertical, 4)
+
+                    if settings.quietHoursEnabled {
+                        SettingsDivider()
+
+                        DatePicker(
+                            "From",
+                            selection: quietHoursStartBinding,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .font(.system(size: 13))
+                        .padding(.vertical, 4)
+
+                        SettingsDivider()
+
+                        DatePicker(
+                            "Until",
+                            selection: quietHoursEndBinding,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .font(.system(size: 13))
+                        .padding(.vertical, 4)
                     }
                 }
             }
-
-            Section("Quiet Hours") {
-                Toggle("Enable quiet hours", isOn: $settings.quietHoursEnabled)
-
-                if settings.quietHoursEnabled {
-                    DatePicker(
-                        "From",
-                        selection: quietHoursStartBinding,
-                        displayedComponents: .hourAndMinute
-                    )
-
-                    DatePicker(
-                        "Until",
-                        selection: quietHoursEndBinding,
-                        displayedComponents: .hourAndMinute
-                    )
-                }
-            }
+            .padding(20)
         }
-        .formStyle(.grouped)
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Time Bindings
 
-    /// Convert minutes-since-midnight Int to/from Date for DatePicker
     private var quietHoursStartBinding: Binding<Date> {
         Binding(
             get: { dateFromMinutes(settings.quietHoursStartMinutes) },
