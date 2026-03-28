@@ -8,17 +8,13 @@ struct BreatheApp: App {
         MenuBarExtra {
             MenuBarView(
                 overlayController: appDelegate.overlayController,
-                settings: appDelegate.userSettings
+                settings: appDelegate.userSettings,
+                onOpenSettings: appDelegate.showSettings
             )
         } label: {
             Label("Breathe", systemImage: "wind")
         }
-        .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsView()
-                .environment(appDelegate.userSettings)
-        }
+        .menuBarExtraStyle(.menu)
 
         Window("Shape Tuner", id: "shape-tuner") {
             ShapeTunerView()

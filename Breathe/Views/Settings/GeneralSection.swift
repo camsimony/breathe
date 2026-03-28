@@ -6,24 +6,39 @@ struct GeneralSection: View {
     var body: some View {
         @Bindable var settings = settings
 
-        Form {
-            Section("Startup") {
-                Toggle("Launch at login", isOn: $settings.launchAtLogin)
-            }
-
-            Section("About") {
-                LabeledContent("Version") {
-                    Text("1.0.0")
-                        .foregroundStyle(.secondary)
+        ScrollView {
+            VStack(spacing: 20) {
+                SettingsCard(title: "Startup") {
+                    HStack {
+                        Text("Launch at login")
+                            .font(.system(size: 13))
+                        Spacer()
+                        Toggle("", isOn: $settings.launchAtLogin)
+                            .toggleStyle(.switch)
+                            .controlSize(.mini)
+                            .labelsHidden()
+                    }
+                    .padding(.vertical, 4)
                 }
 
-                LabeledContent("Breathe") {
-                    Text("Box breathing for macOS")
-                        .foregroundStyle(.secondary)
+                SettingsCard(title: "About") {
+                    SettingsRow("Version") {
+                        Text("1.0.0")
+                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13))
+                    }
+
+                    SettingsDivider()
+
+                    SettingsRow("Breathe") {
+                        Text("Box breathing for macOS")
+                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13))
+                    }
                 }
             }
+            .padding(20)
         }
-        .formStyle(.grouped)
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
