@@ -85,10 +85,78 @@ final class UserSettings {
     @ObservationIgnored
     @AppStorage("breathApproachLeadSeconds") var breathApproachLeadSeconds: Double = 1.0
 
+    @ObservationIgnored
+    @AppStorage("breathingPresentationStyle") private var breathingPresentationStyleRaw: String = BreathingPresentationStyle.notch.rawValue
+
+    var breathingPresentationStyle: BreathingPresentationStyle {
+        get { BreathingPresentationStyle(rawValue: breathingPresentationStyleRaw) ?? .notch }
+        set { breathingPresentationStyleRaw = newValue.rawValue }
+    }
+
     // MARK: - General
 
     @ObservationIgnored
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = true
+
+    // MARK: - Session statistics (Home)
+
+    @ObservationIgnored
+    @AppStorage("statsTotalSeconds") var statsTotalSeconds: Double = 0
+
+    @ObservationIgnored
+    @AppStorage("statsWeekSessionCount") var statsWeekSessionCount: Int = 0
+
+    @ObservationIgnored
+    @AppStorage("statsWeekToken") private var statsWeekToken: String = ""
+
+    @ObservationIgnored
+    @AppStorage("statsTotalFullSessions") var statsTotalFullSessions: Int = 0
+
+    @ObservationIgnored
+    @AppStorage("statsMoodSum") var statsMoodSum: Int = 0
+
+    @ObservationIgnored
+    @AppStorage("statsMoodCount") var statsMoodCount: Int = 0
+
+    func recordBreathingSession(actualSeconds: TimeInterval, countsAsFullSession: Bool, mood: Int?) {
+        guard actualSeconds >= 1 else { return }
+        syncStatsWeekIfNeeded()
+        statsTotalSeconds += actualSeconds
+        if countsAsFullSession {
+            statsWeekSessionCount += 1
+            statsTotalFullSessions += 1
+        }
+        if let mood, (1...3).contains(mood) {
+            statsMoodSum += mood
+            statsMoodCount += 1
+        }
+    }
+
+    private func syncStatsWeekIfNeeded() {
+        let cal = Calendar.current
+        let now = Date()
+        let y = cal.component(.yearForWeekOfYear, from: now)
+        let w = cal.component(.weekOfYear, from: now)
+        let token = "\(y)-\(w)"
+        if statsWeekToken != token {
+            statsWeekToken = token
+            statsWeekSessionCount = 0
+        }
+    }
+}
+
+enum BreathingPresentationStyle: String, CaseIterable, Identifiable {
+    case notch = "notch"
+    case fullscreenOverlay = "overlay"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .notch: "Notch"
+        case .fullscreenOverlay: "Overlay"
+        }
+    }
 }
 
 enum TextTransitionStyle: String, CaseIterable, Identifiable {

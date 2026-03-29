@@ -23,6 +23,7 @@
 		6B65B14E84887AFCF2298127 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8786FC1BD4B88DD31750597 /* LaunchAtLoginManager.swift */; };
 		6BA81C85E864FCD0B026B999 /* WindowAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EFE71121F4A6C3D689439E9 /* WindowAccessor.swift */; };
 		75F752BB337D1B6CD28007BD /* NotchOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */; };
+		FB11AA22BB33CC44DD55EE66 /* FullscreenBreathingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA00BB11CC22DD33EE44FF55 /* FullscreenBreathingOverlayView.swift */; };
 		77E048467B637BD118C69BC9 /* VisualEffectBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF3AC2654B689CC62477FF4 /* VisualEffectBackground.swift */; };
 		85068ABB69C09477A2B7B15D /* ShapeTunerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4D7952E6B2D4F33ADEBD2E /* ShapeTunerView.swift */; };
 		851AEAFB6FD0ED368C5F669A /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362C35629E26BAB6016F4E3D /* ReminderScheduler.swift */; };
@@ -65,6 +66,7 @@
 		4D9A52436FCC13142808DC34 /* GeneralSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSection.swift; sourceTree = "<group>"; };
 		4EFE71121F4A6C3D689439E9 /* WindowAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowAccessor.swift; sourceTree = "<group>"; };
 		64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchOverlayView.swift; sourceTree = "<group>"; };
+		EA00BB11CC22DD33EE44FF55 /* FullscreenBreathingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenBreathingOverlayView.swift; sourceTree = "<group>"; };
 		6D30ADD9745540D40BBA1D45 /* BreathingSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingSessionViewModel.swift; sourceTree = "<group>"; };
 		74697DE978286BFC4A32F2A4 /* NSScreen+Notch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Notch.swift"; sourceTree = "<group>"; };
 		78D5CD41BCA547E138315674 /* SessionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSection.swift; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				CCF9ED589A2C4F42EFCE2B2E /* BreathingSessionView.swift */,
+				EA00BB11CC22DD33EE44FF55 /* FullscreenBreathingOverlayView.swift */,
 				64005923AB45FB4CEE171F7F /* NotchOverlayView.swift */,
 				0704D508BAE98872AA0E6ED0 /* SessionProgressView.swift */,
 				DAAFA4A49D78545C9AB4C780 /* SquarePathView.swift */,
@@ -364,6 +367,7 @@
 				08840B5EF000F3B3488D1184 /* MenuBarView.swift in Sources */,
 				1D2DED5CEC12037E73479DAB /* NSScreen+Notch.swift in Sources */,
 				AF64AEA51A6A58E330976273 /* NotchDetector.swift in Sources */,
+				FB11AA22BB33CC44DD55EE66 /* FullscreenBreathingOverlayView.swift in Sources */,
 				75F752BB337D1B6CD28007BD /* NotchOverlayView.swift in Sources */,
 				9D481505063C2A250FE4C627 /* NotchShape.swift in Sources */,
 				4077731034C1E423CED83406 /* OverlayWindowController.swift in Sources */,

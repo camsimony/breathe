@@ -12,6 +12,13 @@ enum CalmTextTransition {
     /// Hold the sharp string before the next blur-out.
     static let holdAfterSharp: TimeInterval = 0.35
 
+    /// Full 3→2→1 countdown from first digit sharp through final blur-out before `finishCountdown` (matches `NotchOverlayView` / fullscreen `startCountdown` chain).
+    static var countdownFocusRampDuration: TimeInterval {
+        let h = halfDuration
+        let w = holdAfterSharp
+        return (h + w) + 2 * h + w + 2 * h + w + h
+    }
+
     /// Longest phase copy at 20pt semibold rounded (“Exhale” / “Inhale”).
     static let phaseLabelSlotWidth: CGFloat = 108
 
