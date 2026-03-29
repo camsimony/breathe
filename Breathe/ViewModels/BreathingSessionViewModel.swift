@@ -13,12 +13,25 @@ final class BreathingSessionViewModel {
     var cyclesCompleted: Int = 0
     var shouldDismiss: Bool = false
 
+    /// True after the planned session duration elapses (before mood / dismiss).
+    private(set) var finishedFullPlan: Bool = false
+
+    /// Show post-session mood UI; set when the timer reaches the end.
+    var awaitingPostSessionMood: Bool = false
+
+    /// Digits 1–3 are accepted (after mood UI finishes animating in). Used by the overlay key monitor.
+    var postSessionMoodInputReady: Bool = false
+
+    /// Set by AppKit local monitor; SwiftUI observes and calls `submitPostSessionMood`.
+    var pendingMoodShortcut: Int?
+
+    /// Prevents double-recording when both overlay and tearDown run.
+    var statsRecorded: Bool = false
+
     /// Increments only when `currentPhase` changes — reliable `onChange` for blur envelope in hosted views.
     private(set) var phaseGeneration: Int = 0
     /// Once per phase, shortly before the phase ends — lets breath-blur UI start inhale before `phaseGeneration`.
     private(set) var phaseApproachSignal: Int = 0
-
-    var onSessionComplete: (() -> Void)?
 
     // MARK: - Configuration
 
@@ -73,7 +86,8 @@ final class BreathingSessionViewModel {
 
         if sessionProgress >= 1.0 {
             stop()
-            onSessionComplete?()
+            finishedFullPlan = true
+            awaitingPostSessionMood = true
             return
         }
 
@@ -121,5 +135,12 @@ final class BreathingSessionViewModel {
         let minutes = Int(remaining) / 60
         let seconds = Int(remaining) % 60
         return String(format: "%d:%02d", minutes, seconds)
+    }
+
+    var plannedSessionSeconds: TimeInterval { sessionDuration }
+
+    func elapsedSecondsClampedToPlan() -> TimeInterval {
+        guard let start = sessionStartTime else { return 0 }
+        return min(Date().timeIntervalSince(start), sessionDuration)
     }
 }

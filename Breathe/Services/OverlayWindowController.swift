@@ -1,6 +1,11 @@
 import AppKit
 import SwiftUI
 
+/// Borderless session panel must be able to become key so Escape / digit shortcuts reach the app reliably.
+private final class BreathingOverlayPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+}
+
 @Observable
 final class OverlayWindowController {
     private var panel: NSPanel?
@@ -20,32 +25,55 @@ final class OverlayWindowController {
         let vm = BreathingSessionViewModel(settings: settings)
         self.sessionViewModel = vm
 
-        vm.onSessionComplete = { [weak self] in
-            DispatchQueue.main.async {
-                self?.sessionViewModel?.shouldDismiss = true
-            }
+        let rootView: AnyView
+        switch settings.breathingPresentationStyle {
+        case .notch:
+            rootView = AnyView(
+                NotchOverlayView(
+                    viewModel: vm,
+                    notchInfo: info,
+                    settings: settings,
+                    onDismiss: { [weak self] in self?.tearDown(settings: settings) }
+                )
+            )
+        case .fullscreenOverlay:
+            rootView = AnyView(
+                FullscreenBreathingOverlayView(
+                    viewModel: vm,
+                    settings: settings,
+                    onDismiss: { [weak self] in self?.tearDown(settings: settings) }
+                )
+            )
         }
-
-        let rootView = NotchOverlayView(
-            viewModel: vm,
-            notchInfo: info,
-            onDismiss: { [weak self] in self?.tearDown() }
-        )
 
         let panel = createPanel(hasNotch: info.hasNotch)
         let hostingView = NSHostingView(rootView: rootView)
         hostingView.layer?.backgroundColor = .clear
+        hostingView.focusRingType = .none
         panel.contentView = hostingView
         self.panel = panel
 
-        let windowFrame = oversizedFrame(info: info)
+        applyPresentationLevel(panel, style: settings.breathingPresentationStyle)
+
+        let windowFrame = panelFrame(for: settings.breathingPresentationStyle, info: info)
         panel.setFrame(windowFrame, display: false)
         panel.alphaValue = 1
         panel.orderFrontRegardless()
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        panel.makeKeyAndOrderFront(nil)
 
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            if event.keyCode == 53 {
+            if Self.isEscapeKey(event) {
                 self?.dismiss()
+                return nil
+            }
+            if let vm = self?.sessionViewModel,
+               vm.postSessionMoodInputReady,
+               !vm.statsRecorded,
+               let ch = event.charactersIgnoringModifiers?.first,
+               let digit = ch.wholeNumberValue,
+               (1...3).contains(digit) {
+                vm.pendingMoodShortcut = digit
                 return nil
             }
             return event
@@ -57,11 +85,30 @@ final class OverlayWindowController {
     }
 
     /// Instant cleanup — called by the view after the collapse animation finishes.
-    func tearDown() {
+    func tearDown(settings: UserSettings) {
         guard let panel else { return }
         if let monitor = keyMonitor {
             NSEvent.removeMonitor(monitor)
             keyMonitor = nil
+        }
+        if let vm = sessionViewModel, !vm.statsRecorded {
+            if vm.finishedFullPlan {
+                settings.recordBreathingSession(
+                    actualSeconds: vm.plannedSessionSeconds,
+                    countsAsFullSession: true,
+                    mood: nil
+                )
+            } else {
+                let elapsed = vm.elapsedSecondsClampedToPlan()
+                if elapsed >= 1 {
+                    settings.recordBreathingSession(
+                        actualSeconds: elapsed,
+                        countsAsFullSession: false,
+                        mood: nil
+                    )
+                }
+            }
+            vm.statsRecorded = true
         }
         sessionViewModel?.stop()
         panel.orderOut(nil)
@@ -71,8 +118,14 @@ final class OverlayWindowController {
 
     // MARK: - Panel
 
+    private static func isEscapeKey(_ event: NSEvent) -> Bool {
+        if event.keyCode == 53 { return true }
+        if event.charactersIgnoringModifiers == "\u{1b}" { return true }
+        return false
+    }
+
     private func createPanel(hasNotch: Bool) -> NSPanel {
-        let panel = NSPanel(
+        let panel = BreathingOverlayPanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
@@ -92,6 +145,24 @@ final class OverlayWindowController {
         panel.animationBehavior = .none
 
         return panel
+    }
+
+    private func applyPresentationLevel(_ panel: NSPanel, style: BreathingPresentationStyle) {
+        switch style {
+        case .notch:
+            panel.level = .mainMenu + 3
+        case .fullscreenOverlay:
+            panel.level = .screenSaver
+        }
+    }
+
+    private func panelFrame(for style: BreathingPresentationStyle, info: NotchInfo) -> NSRect {
+        switch style {
+        case .notch:
+            return oversizedFrame(info: info)
+        case .fullscreenOverlay:
+            return info.screenFrame
+        }
     }
 
     /// Oversized window centered at screen top. Content is masked inside.

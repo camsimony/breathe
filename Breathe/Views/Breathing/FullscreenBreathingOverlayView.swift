@@ -1,20 +1,23 @@
 import SwiftUI
 
-struct NotchOverlayView: View {
+/// Full-screen dimmed overlay with a large centered box-breathing UI (alternate to `NotchOverlayView`).
+struct FullscreenBreathingOverlayView: View {
     let viewModel: BreathingSessionViewModel
-    let notchInfo: NotchInfo
     let settings: UserSettings
     let onDismiss: () -> Void
 
-    @State private var isExpanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var dimOpacity: CGFloat = 0
+    /// Extra blur on the scrim during countdown (opacity + transform-adjacent; eased down when breathing starts).
+    @State private var backdropBlur: CGFloat = 0
     @State private var contentRevealed = false
     @State private var countdownValue: Int = 3
     @State private var countdownBlur: CGFloat = CalmTextTransition.maxBlurRadius
     @State private var countdownOpacity: CGFloat = 0
-    /// Breathing UI is gone; mood UI is about to / is showing in the same slot as the square path.
     @State private var postSessionMoodActive = false
     @State private var moodContentRevealed = false
-    @State private var dismissInProgress = false
+    @State private var collapseStarted = false
 
     private let moodOptions: [(value: Int, emoji: String)] = [
         (1, "🙁"),
@@ -22,112 +25,94 @@ struct NotchOverlayView: View {
         (3, "😊"),
     ]
 
-    private var notchWidth: CGFloat { notchInfo.notchWidth }
-    private var notchHeight: CGFloat { notchInfo.notchHeight }
-
-    private let expandedWidth: CGFloat = 380
-    private var expandedHeight: CGFloat {
-        let topClearance = notchInfo.hasNotch ? notchHeight + 6 : 12
-        let contentHeight: CGFloat = 194
-        let bottomPadding: CGFloat = 20
-        return topClearance + contentHeight + bottomPadding
-    }
-
-    private let closedTopRadius: CGFloat = 6
-    private let closedBottomRadius: CGFloat = 14
-    private let expandedTopRadius: CGFloat = 15
-    private let expandedBottomRadius: CGFloat = 29
+    private let squarePathScale: CGFloat = 1.78
+    private let squarePathBaseSize: CGFloat = 152
 
     var body: some View {
-        Color.black
-            .overlay {
-                VStack(spacing: 0) {
-                    Spacer().frame(height: notchInfo.hasNotch ? notchHeight + 6 : 12)
-
-                    Spacer()
-
-                    ZStack {
-                        Text("\(countdownValue)")
-                            .font(.system(size: 48, weight: .regular, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                            .frame(width: CalmTextTransition.countdownDigitSlotWidth, alignment: .center)
-                            .blur(radius: countdownBlur)
-                            .opacity(countdownOpacity)
-
-                        SquarePathView(viewModel: viewModel)
-                            .opacity(contentRevealed ? 1 : 0)
-                            .blur(radius: contentRevealed ? 0 : 8)
-                            .scaleEffect(contentRevealed ? 1 : 0.96)
-
-                        postSessionMoodStack
-                    }
-
-                    Spacer()
-
-                    Spacer().frame(height: 20)
-                }
-            }
-            .frame(width: expandedWidth, height: expandedHeight)
-            .clipShape(
-                NotchShape(
-                    shapeWidth: isExpanded ? expandedWidth : notchWidth,
-                    shapeHeight: isExpanded ? expandedHeight : notchHeight,
-                    topCornerRadius: isExpanded ? expandedTopRadius : closedTopRadius,
-                    bottomCornerRadius: isExpanded ? expandedBottomRadius : closedBottomRadius
+        ZStack {
+            ZStack {
+                VisualEffectBackground(
+                    material: .hudWindow,
+                    blendingMode: .behindWindow
                 )
-            )
-            .shadow(color: .black.opacity(isExpanded ? 0.4 : 0), radius: 16, y: 8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .onAppear {
-                DispatchQueue.main.async {
-                    withAnimation(.spring(duration: 0.3, bounce: 0)) {
-                        isExpanded = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        startCountdown()
-                    }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+
+                Color.black.opacity(0.80)
+                    .ignoresSafeArea()
+            }
+            .blur(radius: backdropBlur)
+            .opacity(dimOpacity)
+
+            VStack(spacing: 0) {
+                Spacer()
+
+                ZStack {
+                    Text("\(countdownValue)")
+                        .font(.system(size: 72, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white)
+                        .monospacedDigit()
+                        .frame(width: CalmTextTransition.countdownDigitSlotWidth * 1.35, alignment: .center)
+                        .blur(radius: countdownBlur)
+                        .opacity(countdownOpacity)
+
+                    SquarePathView(viewModel: viewModel, squareSize: squarePathBaseSize)
+                        .scaleEffect(squarePathScale * (contentRevealed ? 1 : 0.96))
+                        .opacity(contentRevealed ? 1 : 0)
+                        .blur(radius: contentRevealed ? 0 : 8)
+
+                    postSessionMoodStack
                 }
+
+                Spacer()
             }
-            .onChange(of: viewModel.shouldDismiss) { _, shouldDismiss in
-                if shouldDismiss { dismissWithAnimation() }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                startCountdown()
             }
-            .onChange(of: viewModel.awaitingPostSessionMood) { _, pending in
-                if pending { beginPostSessionMoodTransition() }
-            }
-            .onChange(of: viewModel.pendingMoodShortcut) { _, value in
-                guard let value else { return }
-                viewModel.pendingMoodShortcut = nil
-                submitPostSessionMood(value)
-            }
-            .focusable()
-            .focusEffectDisabled()
-            .onKeyPress(.escape) {
-                if postSessionMoodActive, moodContentRevealed {
-                    submitPostSessionMood(nil)
-                    return .handled
-                }
-                dismissWithAnimation()
+        }
+        .onChange(of: viewModel.shouldDismiss) { _, shouldDismiss in
+            if shouldDismiss { dismissWithAnimation() }
+        }
+        .onChange(of: viewModel.awaitingPostSessionMood) { _, pending in
+            if pending { beginPostSessionMoodTransition() }
+        }
+        .onChange(of: viewModel.pendingMoodShortcut) { _, value in
+            guard let value else { return }
+            viewModel.pendingMoodShortcut = nil
+            submitPostSessionMood(value)
+        }
+        .focusable()
+        .focusEffectDisabled()
+        .onKeyPress(.escape) {
+            if postSessionMoodActive, moodContentRevealed {
+                submitPostSessionMood(nil)
                 return .handled
             }
-            .onKeyPress { press in
-                guard postSessionMoodActive, moodContentRevealed,
-                      !viewModel.statsRecorded else { return .ignored }
-                let key = press.key
-                if key == KeyEquivalent("1") {
-                    submitPostSessionMood(1)
-                    return .handled
-                }
-                if key == KeyEquivalent("2") {
-                    submitPostSessionMood(2)
-                    return .handled
-                }
-                if key == KeyEquivalent("3") {
-                    submitPostSessionMood(3)
-                    return .handled
-                }
-                return .ignored
+            dismissWithAnimation()
+            return .handled
+        }
+        .onKeyPress { press in
+            guard postSessionMoodActive, moodContentRevealed,
+                  !viewModel.statsRecorded else { return .ignored }
+            let key = press.key
+            if key == KeyEquivalent("1") {
+                submitPostSessionMood(1)
+                return .handled
             }
+            if key == KeyEquivalent("2") {
+                submitPostSessionMood(2)
+                return .handled
+            }
+            if key == KeyEquivalent("3") {
+                submitPostSessionMood(3)
+                return .handled
+            }
+            return .ignored
+        }
     }
 
     // MARK: - Post-session mood
@@ -135,26 +120,26 @@ struct NotchOverlayView: View {
     private var postSessionMoodStack: some View {
         Group {
             if postSessionMoodActive {
-                VStack(spacing: 10) {
+                VStack(spacing: 14) {
                     Text("How do you feel?")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
 
-                    HStack(spacing: 20) {
+                    HStack(spacing: 28) {
                         ForEach(moodOptions, id: \.value) { option in
                             Button {
                                 submitPostSessionMood(option.value)
                             } label: {
-                                VStack(spacing: 5) {
+                                VStack(spacing: 6) {
                                     Text(option.emoji)
-                                        .font(.system(size: 34))
+                                        .font(.system(size: 44))
                                         .accessibilityHidden(true)
                                     Text("\(option.value)")
-                                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                                        .font(.system(size: 13, weight: .regular, design: .rounded))
                                         .foregroundStyle(.white.opacity(0.5))
                                         .monospacedDigit()
                                 }
-                                .frame(minWidth: 52)
+                                .frame(minWidth: 60)
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
@@ -167,7 +152,7 @@ struct NotchOverlayView: View {
                         submitPostSessionMood(nil)
                     }
                     .buttonStyle(.plain)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.55))
                 }
                 .multilineTextAlignment(.center)
@@ -228,9 +213,21 @@ struct NotchOverlayView: View {
         }
     }
 
-    // MARK: - Countdown (calm blur envelope)
+    // MARK: - Countdown
 
     private func startCountdown() {
+        let ramp = CalmTextTransition.countdownFocusRampDuration
+        if reduceMotion {
+            dimOpacity = 1
+            backdropBlur = 0
+        } else {
+            // design-eng: steady linear ramp over the countdown = predictable “settle into focus.”
+            withAnimation(.linear(duration: ramp)) {
+                dimOpacity = 1
+                backdropBlur = 12
+            }
+        }
+
         countdownValue = 3
         countdownBlur = CalmTextTransition.maxBlurRadius
         countdownOpacity = 0
@@ -281,6 +278,12 @@ struct NotchOverlayView: View {
     }
 
     private func finishCountdown() {
+        if !reduceMotion {
+            // Ease backdrop blur down so the room stays softened but the exercise UI reads sharp.
+            withAnimation(.easeOut(duration: 0.42)) {
+                backdropBlur = 4
+            }
+        }
         viewModel.start()
         withAnimation(.easeOut(duration: 0.35)) {
             contentRevealed = true
@@ -290,24 +293,21 @@ struct NotchOverlayView: View {
     // MARK: - Dismiss
 
     private func dismissWithAnimation() {
-        guard !dismissInProgress else { return }
-        dismissInProgress = true
+        guard !collapseStarted else { return }
+        collapseStarted = true
+        viewModel.postSessionMoodInputReady = false
 
-        // Opening spring hasn’t finished yet — still tear down (Escape / menu must always work).
-        if !isExpanded {
-            onDismiss()
-            return
-        }
-
-        withAnimation(.easeIn(duration: 0.15)) {
+        withAnimation(.easeIn(duration: 0.28)) {
             contentRevealed = false
+            moodContentRevealed = false
         }
 
-        withAnimation(.spring(duration: 0.3, bounce: 0).delay(0.08)) {
-            isExpanded = false
+        withAnimation(.easeIn(duration: 0.42)) {
+            dimOpacity = 0
+            backdropBlur = 0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
             onDismiss()
         }
     }

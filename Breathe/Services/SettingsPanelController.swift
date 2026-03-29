@@ -6,6 +6,9 @@ final class SettingsPanelController: NSObject, NSWindowDelegate {
     private let settings: UserSettings
     private var panel: NSPanel?
 
+    private static let preferredContentWidth: CGFloat = 750
+    private static let preferredMinHeight: CGFloat = 380
+
     /// Shift traffic lights right so they line up with the sidebar icon column (titlebar accessory does not move them with a unified toolbar).
     private static let trafficLightLeadingInset: CGFloat = 11
 
@@ -19,6 +22,8 @@ final class SettingsPanelController: NSObject, NSWindowDelegate {
         let panel = panel ?? makePanel()
         self.panel = panel
 
+        normalizePanelContentWidth(panel)
+
         NSApplication.shared.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
 
@@ -29,8 +34,21 @@ final class SettingsPanelController: NSObject, NSWindowDelegate {
         panel?.orderOut(nil)
     }
 
+    /// Panel is reused for the app lifetime; resize when `preferredContentWidth` changes or after an older build created a narrower window.
+    private func normalizePanelContentWidth(_ panel: NSWindow) {
+        var frame = panel.frame
+        let target = Self.preferredContentWidth
+        guard abs(frame.size.width - target) > 0.5 else { return }
+        let midX = frame.midX
+        frame.size.width = target
+        frame.origin.x = midX - frame.width / 2
+        panel.setFrame(frame, display: true)
+    }
+
     private func makePanel() -> NSPanel {
-        let frame = NSRect(x: 0, y: 0, width: 680, height: 380)
+        let w = Self.preferredContentWidth
+        let h = Self.preferredMinHeight
+        let frame = NSRect(x: 0, y: 0, width: w, height: h)
         let panel = NSPanel(
             contentRect: frame,
             styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView, .resizable],
@@ -48,8 +66,8 @@ final class SettingsPanelController: NSObject, NSWindowDelegate {
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
         panel.delegate = self
-        panel.minSize = NSSize(width: 680, height: 380)
-        panel.maxSize = NSSize(width: 680, height: 10_000)
+        panel.minSize = NSSize(width: w, height: h)
+        panel.maxSize = NSSize(width: w, height: 10_000)
         if #available(macOS 15.0, *) {
             panel.titlebarSeparatorStyle = .none
         }
